@@ -70,15 +70,26 @@
       this.top = this.position.y + this.height / 2;
 
       this.velocity = velocity;
+      this.gravity = -0.003;
     }
 
     update(ground) {
       this.bottom = this.position.y - this.height / 2;
       this.top = this.position.y + this.height / 2;
 
-      this.position.y += this.velocity.y;
+      this.applyGravity();
+    }
 
-      if (this.bottom <= ground.top) this.velocity.y = 0;
+    applyGravity() {
+      this.velocity.y += this.gravity;
+
+      // hitting the ground
+      if (this.bottom + this.velocity.y <= ground.top) {
+        this.velocity.y *= 0.8; // adding friction, slowing speed with each bounce
+        this.velocity.y = -this.velocity.y; // bounce
+      } else {
+        this.position.y += this.velocity.y;
+      }
     }
   }
 
