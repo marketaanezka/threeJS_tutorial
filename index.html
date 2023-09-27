@@ -38,15 +38,16 @@
   const controls = new OrbitControls(camera, renderer.domElement);
 
   class Box extends THREE.Mesh {
-    constructor({ width, height, depth }) {
+    constructor({ width, height, depth, color = "#00ff00" }) {
       super(
         new THREE.BoxGeometry(width, height, depth),
-        new THREE.MeshStandardMaterial({ color: 0x00ff22 })
+        new THREE.MeshStandardMaterial({ color })
       );
 
       this.height = height;
       this.width = width;
       this.depth = depth;
+      this.color = color;
     }
   }
 
@@ -58,15 +59,20 @@
   cube.castShadow = true;
   scene.add(cube);
 
-  console.log(cube.width);
+  console.log(cube.position.y - cube.height / 2); //cube bottom
 
-  const ground = new THREE.Mesh(
-    new THREE.BoxGeometry(5, 0.5, 10),
-    new THREE.MeshStandardMaterial({ color: 0x0000ff })
-  );
+  const ground = new Box({
+    width: 5,
+    height: 0.5,
+    depth: 10,
+    color: "#0000ff",
+  });
+
   ground.receiveShadow = true;
   ground.position.y = -2;
   scene.add(ground);
+
+  console.log(ground.position.y + ground.height / 2); // ground top
 
   const light = new THREE.DirectionalLight(0xffffff, 1);
   light.position.y = 3;
