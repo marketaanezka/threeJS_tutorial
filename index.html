@@ -54,6 +54,7 @@
         y: 0,
         z: 0,
       },
+      zAcceleration = false,
     }) {
       super(
         new THREE.BoxGeometry(width, height, depth),
@@ -77,7 +78,9 @@
       this.back = this.position.z - this.depth / 2;
 
       this.velocity = velocity;
-      this.gravity = -0.0035;
+      this.gravity = -0.005;
+
+      this.zAcceleration = zAcceleration;
     }
 
     updateSides() {
@@ -93,6 +96,8 @@
 
     update(ground) {
       this.updateSides();
+
+      if (this.zAcceleration === true) this.velocity.z += 0.0001;
 
       this.position.x += this.velocity.x;
       this.position.z += this.velocity.z;
@@ -213,8 +218,30 @@
     }
   });
 
+  const enemy = new Box({
+    width: 1,
+    height: 1,
+    depth: 1,
+    position: {
+      x: 0,
+      y: 0,
+      z: -3,
+    },
+    velocity: {
+      x: 0,
+      y: 0,
+      z: 0.005,
+    },
+    color: "red",
+    zAcceleration: true,
+  });
+  enemy.castShadow = true;
+  scene.add(enemy);
+
+  const enemies = [enemy];
+
   function animate() {
-    requestAnimationFrame(animate);
+    const animationFrameID = requestAnimationFrame(animate);
     renderer.render(scene, camera);
 
     //movement x
@@ -234,6 +261,18 @@
     }
 
     cube.update(ground);
+    enemies.forEach((enemy) => {
+      enemy.update(ground);
+      if (
+        boxCollision({
+          box1: cube,
+          box2: enemy,
+        })
+      ) {
+        window.cancelAnimationFrame(animationFrameID);
+        console.log("collision");
+      }
+    });
   }
   animate();
 </script>
