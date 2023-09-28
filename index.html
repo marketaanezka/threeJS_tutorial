@@ -97,27 +97,35 @@
       this.position.x += this.velocity.x;
       this.position.z += this.velocity.z;
 
-      const xCollision = this.right >= ground.left && this.left <= ground.right;
-      const zCollision = this.front >= ground.back && this.back <= ground.front;
-      // detect collision on x axis
-      if (xCollision && zCollision) {
-        console.log("Touching");
-      }
-
-      this.applyGravity();
+      this.applyGravity(ground);
     }
 
-    applyGravity() {
+    applyGravity(ground) {
       this.velocity.y += this.gravity;
 
       // hitting the ground
-      if (this.bottom + this.velocity.y <= ground.top) {
+      if (
+        boxCollision({
+          box1: this,
+          box2: ground,
+        })
+      ) {
         this.velocity.y *= 0.8; // adding friction, slowing speed with each bounce
         this.velocity.y = -this.velocity.y; // bounce
       } else {
         this.position.y += this.velocity.y;
       }
     }
+  }
+
+  function boxCollision({ box1, box2 }) {
+    const xCollision = box1.right >= box2.left && box1.left <= box2.right;
+    // here you need to add gravity, thats the y velocity
+    const yCollision =
+      box1.top >= box2.bottom && box1.bottom + box1.velocity.y <= box2.top;
+    const zCollision = box1.front >= box2.back && box1.back <= box2.front;
+    // detect if box1 is touching box2
+    return xCollision && yCollision && zCollision;
   }
 
   const cube = new Box({
