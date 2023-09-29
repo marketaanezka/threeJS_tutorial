@@ -218,27 +218,10 @@
     }
   });
 
-  const enemy = new Box({
-    width: 1,
-    height: 1,
-    depth: 1,
-    position: {
-      x: 0,
-      y: 0,
-      z: -3,
-    },
-    velocity: {
-      x: 0,
-      y: 0,
-      z: 0.005,
-    },
-    color: "red",
-    zAcceleration: true,
-  });
-  enemy.castShadow = true;
-  scene.add(enemy);
+  const enemies = [];
 
-  const enemies = [enemy];
+  let frames = 0;
+  let spawnRate = 200;
 
   function animate() {
     const animationFrameID = requestAnimationFrame(animate);
@@ -261,6 +244,7 @@
     }
 
     cube.update(ground);
+
     enemies.forEach((enemy) => {
       enemy.update(ground);
       if (
@@ -273,6 +257,33 @@
         console.log("collision");
       }
     });
+
+    if (frames % spawnRate === 0) {
+      if (spawnRate > 20) spawnRate -= 20;
+
+      const enemy = new Box({
+        width: 1,
+        height: 1,
+        depth: 1,
+        position: {
+          x: (Math.random() - 0.5) * 5,
+          y: 0,
+          z: -3,
+        },
+        velocity: {
+          x: 0,
+          y: 0,
+          z: 0.002,
+        },
+        color: "red",
+        zAcceleration: true,
+      });
+      enemy.castShadow = true;
+      scene.add(enemy);
+      enemies.push(enemy);
+    }
+
+    frames++;
   }
   animate();
 </script>
