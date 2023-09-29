@@ -2,6 +2,7 @@
 <style>
   body {
     margin: 0;
+    background-color: rgb(34, 54, 78);
   }
 </style>
 
@@ -31,7 +32,12 @@
     1000
   );
 
-  const renderer = new THREE.WebGLRenderer();
+  camera.position.set(4.61, 2.74, 8);
+
+  const renderer = new THREE.WebGLRenderer({
+    alpha: true, // uses background color of the HTML
+    antialias: true, // makes movement smooth
+  });
   renderer.shadowMap.enabled = true;
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
@@ -115,7 +121,8 @@
           box2: ground,
         })
       ) {
-        this.velocity.y *= 0.8; // adding friction, slowing speed with each bounce
+        const friction = 0.5;
+        this.velocity.y *= friction; // adding friction, slowing speed with each bounce
         this.velocity.y = -this.velocity.y; // bounce
       } else {
         this.position.y += this.velocity.y;
@@ -147,10 +154,10 @@
   scene.add(cube);
 
   const ground = new Box({
-    width: 5,
+    width: 6,
     height: 0.5,
-    depth: 10,
-    color: "#0000ff",
+    depth: 50,
+    color: "#0369a1",
     position: {
       x: 0,
       y: -3,
@@ -163,9 +170,11 @@
 
   const light = new THREE.DirectionalLight(0xffffff, 1);
   light.position.y = 3;
-  light.position.z = 2;
+  light.position.z = 0.5;
   light.castShadow = true;
   scene.add(light);
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.5));
 
   camera.position.z = 5;
 
@@ -198,6 +207,9 @@
       case "KeyW":
         keys.w.pressed = true;
         break;
+      case "Space":
+        cube.velocity.y = 0.1;
+        break;
     }
   });
 
@@ -221,7 +233,7 @@
   const enemies = [];
 
   let frames = 0;
-  let spawnRate = 200;
+  let spawnRate = 600;
 
   function animate() {
     const animationFrameID = requestAnimationFrame(animate);
@@ -259,7 +271,7 @@
     });
 
     if (frames % spawnRate === 0) {
-      if (spawnRate > 20) spawnRate -= 20;
+      if (spawnRate > 20) spawnRate -= 10;
 
       const enemy = new Box({
         width: 1,
@@ -268,7 +280,7 @@
         position: {
           x: (Math.random() - 0.5) * 5,
           y: 0,
-          z: -3,
+          z: -20,
         },
         velocity: {
           x: 0,
